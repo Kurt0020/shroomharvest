@@ -1,0 +1,36 @@
+{
+  "name": "shroomharvest",
+  "private": true,
+  "version": "0.1.0",
+  "description": "ShroomHarvest — Shopify custom theme + Smart Inventory Insights embedded app",
+  "workspaces": [
+    "app/client",
+    "app/server"
+  ],
+  "scripts": {
+    "dev:server": "npm run dev --workspace=app/server",
+    "dev:client": "npm run dev --workspace=app/client",
+    "db:generate": "npm run db:generate --workspace=app/server",
+    "db:migrate": "npm run db:migrate --workspace=app/server",
+    "db:seed": "npm run db:seed --workspace=app/server",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "cloudflare": "powershell -ExecutionPolicy Bypass -File scripts/start-cloudflare.ps1",
+  "shopify": "powershell -ExecutionPolicy Bypass -File scripts/sync-shopify.ps1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "concurrently": "^10.0.3",
+    "cross-env": "^10.1.0",
+    "dotenv": "^17.4.2",
+    "tsx": "^4.23.1",
+    "typescript": "^7.0.2"
+  }
+}

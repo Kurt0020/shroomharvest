@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="{{ request.locale.iso_code }}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>
+      {{ page_title }}{% if page_title != shop.name %} &middot; {{ shop.name }}{% endif %}
+    </title>
+
+    {% if page_description %}
+      <meta name="description" content="{{ page_description | escape }}">
+    {% endif %}
+
+    <link rel="canonical" href="{{ canonical_url }}">
+    {{ content_for_header }}
+
+    {{ 'base.css' | asset_url | stylesheet_tag }}
+  </head>
+  <body>
+    <a class="visually-hidden skip-to-content-link" href="#MainContent">
+      Skip to content
+    </a>
+
+    {% comment %}
+      Header / footer sections and full page content are built out in
+      Module 8 (Shopify Theme) and Module 9 (Custom Sections). This is a
+      valid, minimal layout so `shopify theme dev` can preview immediately.
+    {% endcomment %}
+
+    <main id="MainContent">
+      {{ content_for_layout }}
+    </main>
+
+    {{ 'global.js' | asset_url | script_tag }}
+  </body>
+</html>
