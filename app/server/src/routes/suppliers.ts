@@ -5,9 +5,11 @@ import {
   createSupplierSchema,
   listSuppliersQuerySchema,
   supplierIdParamSchema,
+  updateSupplierSchema,
   type ListSuppliersQuery,
+  type UpdateSupplierInput,
 } from "../validators/supplier.validators.js";
-import { createSupplier, getSupplierById, listSuppliers } from "../services/supplierService.js";
+import { createSupplier, getSupplierById, listSuppliers, updateSupplier } from "../services/supplierService.js";
 
 export const suppliersRouter = Router();
 
@@ -37,5 +39,17 @@ suppliersRouter.post(
   asyncHandler(async (req, res) => {
     const supplier = await createSupplier(req.shopId as number, req.body);
     res.status(201).json({ data: supplier });
+  })
+);
+
+suppliersRouter.patch(
+  "/:id",
+  validate(supplierIdParamSchema, "params"),
+  validate(updateSupplierSchema, "body"),
+  asyncHandler(async (req, res) => {
+    const { id } = req.params as unknown as { id: number };
+    const body = req.body as UpdateSupplierInput;
+    const supplier = await updateSupplier(req.shopId as number, id, body);
+    res.json({ data: supplier });
   })
 );

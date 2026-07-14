@@ -24,3 +24,18 @@ export type ListSuppliersQuery = z.infer<typeof listSuppliersQuerySchema>;
 export const supplierIdParamSchema = z.object({
   id: z.coerce.number().int().positive(),
 });
+
+export const updateSupplierSchema = z
+  .object({
+    name: z.string().trim().min(1).max(255).optional(),
+    contactEmail: z.string().email().max(255).optional(),
+    contactPhone: z.string().trim().max(64).optional(),
+    leadTimeDays: z.coerce.number().int().positive().optional(),
+    notes: z.string().trim().max(2000).optional(),
+    isActive: z.coerce.boolean().optional(),
+  })
+  .refine((data) => Object.keys(data).length > 0, {
+    message: "At least one field must be provided.",
+  });
+
+export type UpdateSupplierInput = z.infer<typeof updateSupplierSchema>;

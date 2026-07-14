@@ -2,6 +2,7 @@ import { and, count, desc, eq } from "drizzle-orm";
 import { db } from "../db/client.js";
 import { inventory, inventoryHistory, products } from "../db/schema.js";
 import { NotFoundError } from "../lib/errors.js";
+import { computeInventoryStatus } from "../lib/inventoryStatus.js";
 import { logActivity } from "./activityLogService.js";
 import type { CreateProductInput, ListProductsQuery } from "../validators/product.validators.js";
 
@@ -79,12 +80,7 @@ export async function createProduct(shopId: number, input: CreateProductInput) {
       })
       .$returningId();
 
-    const initialStatus =
-      input.initialQuantity === 0
-        ? "out_of_stock"
-        : input.initialQuantity <= input.lowStockThreshold
-          ? "low_stock"
-          : "in_stock";
+    const initialStatus = computeInventoryStatus(input.initialQuantity, input.lowStockThreshold);
 
     const [inventoryResult] = await tx
       .insert(inventory)

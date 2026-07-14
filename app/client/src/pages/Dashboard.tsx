@@ -12,7 +12,6 @@ import {
   Spinner,
   Text,
 } from "@shopify/polaris";
-
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { fetchDashboardSummary } from "../lib/api.js";
 import type { DashboardSummary, InventoryRow } from "../types/dashboard.js";

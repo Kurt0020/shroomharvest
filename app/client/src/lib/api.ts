@@ -1,4 +1,4 @@
-import type { DashboardSummary } from "../types/dashboard.js";
+import type { DashboardSummary, InventoryRow, Paginated, Supplier } from "../types/dashboard.js";
 
 export class ApiError extends Error {
   constructor(
@@ -14,14 +14,96 @@ export class ApiError extends Error {
  * session token to same-origin requests (see Module 2). No custom wrapper
  * needed.
  */
-export async function fetchDashboardSummary(): Promise<DashboardSummary> {
-  const res = await fetch("/api/dashboard/summary");
+async function apiFetch<T>(input: string, init?: RequestInit): Promise<T> {
+  const res = await fetch(input, {
+    ...init,
+    headers: { "Content-Type": "application/json", ...init?.headers },
+  });
 
   if (!res.ok) {
     const body = await res.json().catch(() => null);
     throw new ApiError(body?.error?.message ?? `Request failed with status ${res.status}`, res.status);
   }
 
-  const body = (await res.json()) as { data: DashboardSummary };
+  return res.json() as Promise<T>;
+}
+
+export async function fetchDashboardSummary(): Promise<DashboardSummary> {
+  const body = await apiFetch<{ data: DashboardSummary }>("/api/dashboard/summary");
+  return body.data;
+}
+
+export async function fetchInventory(): Promise<Paginated<InventoryRow>> {
+  return apiFetch<Paginated<InventoryRow>>("/api/inventory?pageSize=100");
+}
+
+export async function adjustStock(inventoryId: number, delta: number, note?: string) {
+  const body = await apiFetch<{ data: InventoryRow }>(`/api/inventory/${inventoryId}/adjust`, {
+    method: "POST",
+    body: JSON.stringify({ delta, note }),
+  });
+  return body.data;
+}
+
+export async function updateInventoryThresholds(
+  inventoryId: number,
+  input: Partial<{
+    supplierId: number | null;
+    reorderPoint: number;
+    reorderQuantity: number;
+    lowStockThreshold: number;
+    safetyStock: number;
+  }>
+) {
+  const body = await apiFetch<{ data: InventoryRow }>(`/api/inventory/${inventoryId}`, {
+    method: "PATCH",
+    body: JSON.stringify(input),
+  });
+  return body.data;
+}
+
+export async function archiveInventory(inventoryId: number) {
+  const body = await apiFetch<{ data: InventoryRow }>(`/api/inventory/${inventoryId}/archive`, { method: "POST" });
+  return body.data;
+}
+
+export async function unarchiveInventory(inventoryId: number) {
+  const body = await apiFetch<{ data: InventoryRow }>(`/api/inventory/${inventoryId}/unarchive`, { method: "POST" });
+  return body.data;
+}
+
+export async function fetchSuppliers(): Promise<Paginated<Supplier>> {
+  return apiFetch<Paginated<Supplier>>("/api/suppliers?pageSize=100");
+}
+
+export async function createSupplier(input: {
+  name: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  leadTimeDays?: number;
+  notes?: string;
+}) {
+  const body = await apiFetch<{ data: Supplier }>("/api/suppliers", {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+  return body.data;
+}
+
+export async function updateSupplier(
+  supplierId: number,
+  input: Partial<{
+    name: string;
+    contactEmail: string;
+    contactPhone: string;
+    leadTimeDays: number;
+    notes: string;
+    isActive: boolean;
+  }>
+) {
+  const body = await apiFetch<{ data: Supplier }>(`/api/suppliers/${supplierId}`, {
+    method: "PATCH",
+    body: JSON.stringify(input),
+  });
   return body.data;
 }

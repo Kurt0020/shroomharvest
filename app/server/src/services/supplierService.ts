@@ -3,7 +3,7 @@ import { db } from "../db/client.js";
 import { suppliers } from "../db/schema.js";
 import { NotFoundError } from "../lib/errors.js";
 import { logActivity } from "./activityLogService.js";
-import type { CreateSupplierInput, ListSuppliersQuery } from "../validators/supplier.validators.js";
+import type { CreateSupplierInput, ListSuppliersQuery, UpdateSupplierInput } from "../validators/supplier.validators.js";
 
 export async function listSuppliers(shopId: number, query: ListSuppliersQuery) {
   const conditions = [eq(suppliers.shopId, shopId)];
@@ -62,6 +62,39 @@ export async function createSupplier(shopId: number, input: CreateSupplierInput)
     });
 
     const [supplier] = await tx.select().from(suppliers).where(eq(suppliers.id, result.id)).limit(1);
+    return supplier;
+  });
+}
+
+/**
+ * Partial update — supports both editing contact/lead-time info and
+ * deactivating a supplier (isActive: false) through the same endpoint,
+ * since a supplier "archive" is really just this one field flipping.
+ */
+export async function updateSupplier(shopId: number, supplierId: number, input: UpdateSupplierInput) {
+  await getSupplierById(shopId, supplierId); // throws NotFoundError if missing/wrong shop
+
+  return db.transaction(async (tx) => {
+    await tx
+      .update(suppliers)
+      .set(input)
+      .where(and(eq(suppliers.id, supplierId), eq(suppliers.shopId, shopId)));
+
+    await logActivity(tx, {
+      shopId,
+      entityType: "supplier",
+      entityId: supplierId,
+      action: "supplier_updated",
+      description: `Supplier #${supplierId} updated.`,
+      metadata: { changes: input },
+    });
+
+    const [supplier] = await tx
+      .select()
+      .from(suppliers)
+      .where(and(eq(suppliers.id, supplierId), eq(suppliers.shopId, shopId)))
+      .limit(1);
+
     return supplier;
   });
 }
