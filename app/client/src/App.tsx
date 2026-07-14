@@ -3,15 +3,17 @@ import { Tabs } from "@shopify/polaris";
 import Dashboard from "./pages/Dashboard.js";
 import InventoryPage from "./pages/InventoryPage.js";
 import SuppliersPage from "./pages/SuppliersPage.js";
+import ActivityPage from "./pages/ActivityPage.js";
 
 const TABS = [
   { id: "dashboard", content: "Dashboard" },
   { id: "inventory", content: "Inventory" },
   { id: "suppliers", content: "Suppliers" },
+  { id: "activity", content: "Activity" },
 ];
 
 /**
- * Module 5 adds real UI for the inventory/supplier write workflows, so a
+ * Module 5 added real UI for the inventory/supplier write workflows, so a
  * single static Dashboard page isn't enough anymore. Using Polaris Tabs
  * here instead of react-router: it's a single embedded page with no deep
  * links needed yet, and Tabs avoids browser-history complications inside
@@ -27,6 +29,7 @@ export default function App() {
       {selected === 0 && <Dashboard />}
       {selected === 1 && <InventoryPage />}
       {selected === 2 && <SuppliersPage />}
+      {selected === 3 && <ActivityPage />}
     </>
   );
 }

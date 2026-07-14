@@ -1,3 +1,13 @@
+export interface Paginated<T> {
+  data: T[];
+  pagination: {
+    page: number;
+    pageSize: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
 export type ProductCategory =
   | "fresh_mushrooms"
   | "dried_mushrooms"
@@ -20,7 +30,11 @@ export interface Product {
 export interface Supplier {
   id: number;
   name: string;
+  contactEmail: string | null;
+  contactPhone: string | null;
   leadTimeDays: number;
+  notes: string | null;
+  isActive: boolean;
 }
 
 export interface InventoryRecord {
@@ -39,11 +53,28 @@ export interface InventoryRow {
   supplier: Supplier | null;
 }
 
+export const ACTIVITY_ENTITY_TYPES = ["product", "inventory", "supplier", "recommendation"] as const;
+export type ActivityEntityType = (typeof ACTIVITY_ENTITY_TYPES)[number];
+
+export const ACTIVITY_ACTIONS = [
+  "product_created",
+  "product_updated",
+  "inventory_updated",
+  "inventory_archived",
+  "inventory_unarchived",
+  "threshold_changed",
+  "supplier_created",
+  "supplier_updated",
+  "recommendation_generated",
+  "recommendation_resolved",
+] as const;
+export type ActivityAction = (typeof ACTIVITY_ACTIONS)[number];
+
 export interface ActivityLogEntry {
   id: number;
-  entityType: string;
+  entityType: ActivityEntityType;
   entityId: number;
-  action: string;
+  action: ActivityAction;
   description: string;
   createdAt: string;
 }

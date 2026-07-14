@@ -2,7 +2,7 @@
 
 client_id = "45e553a0fbbdb094fd055b00b94eab1d"
 name = "shroomharvest"
-application_url = "https://minolta-clicking-characteristic-jewish.trycloudflare.com"
+application_url = "https://awesome-civilization-disciplines-devon.trycloudflare.com"
 embedded = true
 
 [webhooks]
@@ -14,7 +14,8 @@ scopes = "read_inventory,read_orders,read_products,write_inventory,write_product
 use_legacy_install_flow = false
 
 [auth]
-redirect_urls = [ "https://minolta-clicking-characteristic-jewish.trycloudflare.com" ]
+redirect_urls = [ "https://awesome-civilization-disciplines-devon.trycloudflare.com" ]
+
 
 
 

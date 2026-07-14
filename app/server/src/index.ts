@@ -7,6 +7,7 @@ import { productsRouter } from "./routes/products.js";
 import { suppliersRouter } from "./routes/suppliers.js";
 import { inventoryRouter } from "./routes/inventory.js";
 import { dashboardRouter } from "./routes/dashboard.js";
+import { activityRouter } from "./routes/activity.js";
 import { verifyRequest } from "./middleware/verifyRequest.js";
 import { attachShop } from "./middleware/attachShop.js";
 import { errorHandler } from "./middleware/errorHandler.js";
@@ -33,6 +34,7 @@ app.use("/api/products", productsRouter);
 app.use("/api/suppliers", suppliersRouter);
 app.use("/api/inventory", inventoryRouter);
 app.use("/api/dashboard", dashboardRouter);
+app.use("/api/activity", activityRouter);
 
 // Must be registered last — Express identifies error middleware by its
 // 4-argument signature, so anything after this point is unreachable.

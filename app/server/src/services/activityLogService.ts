@@ -1,5 +1,8 @@
+import { and, count, desc, eq, gte, like, lte } from "drizzle-orm";
+import { db } from "../db/client.js";
 import { activityLogs } from "../db/schema.js";
 import type { db as DbClient } from "../db/client.js";
+import type { ListActivityQuery } from "../validators/activity.validators.js";
 
 // Accepts either the shared `db` client or a transaction object (`tx`) —
 // both expose the same `.insert(...)` query builder shape structurally,
@@ -46,4 +49,44 @@ export async function logActivity(executor: Executor, input: LogActivityInput) {
     description: input.description,
     metadata: input.metadata ?? null,
   });
+}
+
+/**
+ * Powers the Activity Tracking screen: filterable by entity type, action,
+ * free-text search over the description, and a date range, always scoped
+ * to the shop and always newest-first (this is a history/timeline view,
+ * not a table you'd want re-sorted).
+ */
+export async function listActivity(shopId: number, query: ListActivityQuery) {
+  const conditions = [eq(activityLogs.shopId, shopId)];
+
+  if (query.entityType) conditions.push(eq(activityLogs.entityType, query.entityType));
+  if (query.action) conditions.push(eq(activityLogs.action, query.action));
+  if (query.search) conditions.push(like(activityLogs.description, `%${query.search}%`));
+  if (query.startDate) conditions.push(gte(activityLogs.createdAt, query.startDate));
+  if (query.endDate) conditions.push(lte(activityLogs.createdAt, query.endDate));
+
+  const where = and(...conditions);
+  const offset = (query.page - 1) * query.pageSize;
+
+  const [rows, [{ total }]] = await Promise.all([
+    db
+      .select()
+      .from(activityLogs)
+      .where(where)
+      .orderBy(desc(activityLogs.createdAt))
+      .limit(query.pageSize)
+      .offset(offset),
+    db.select({ total: count() }).from(activityLogs).where(where),
+  ]);
+
+  return {
+    data: rows,
+    pagination: {
+      page: query.page,
+      pageSize: query.pageSize,
+      total,
+      totalPages: Math.ceil(total / query.pageSize),
+    },
+  };
 }

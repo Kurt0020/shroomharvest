@@ -1,4 +1,4 @@
-import type { DashboardSummary, InventoryRow, Paginated, Supplier } from "../types/dashboard.js";
+import type { ActivityLogEntry, DashboardSummary, InventoryRow, Paginated, Supplier } from "../types/dashboard.js";
 
 export class ApiError extends Error {
   constructor(
@@ -106,4 +106,26 @@ export async function updateSupplier(
     body: JSON.stringify(input),
   });
   return body.data;
+}
+
+export interface ActivityFilters {
+  entityType?: string;
+  action?: string;
+  search?: string;
+  startDate?: string;
+  endDate?: string;
+  page?: number;
+}
+
+export async function fetchActivity(filters: ActivityFilters = {}): Promise<Paginated<ActivityLogEntry>> {
+  const params = new URLSearchParams();
+  params.set("pageSize", "50");
+  if (filters.entityType) params.set("entityType", filters.entityType);
+  if (filters.action) params.set("action", filters.action);
+  if (filters.search) params.set("search", filters.search);
+  if (filters.startDate) params.set("startDate", filters.startDate);
+  if (filters.endDate) params.set("endDate", filters.endDate);
+  if (filters.page) params.set("page", String(filters.page));
+
+  return apiFetch<Paginated<ActivityLogEntry>>(`/api/activity?${params.toString()}`);
 }
