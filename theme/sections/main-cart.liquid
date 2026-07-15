@@ -1,0 +1,99 @@
+<div class="page-width">
+  <h1 style="padding-top: var(--space-4);">Your cart</h1>
+
+  {% if cart.item_count > 0 %}
+    <div class="cart-layout">
+      {% form 'cart', cart, id: 'CartForm' %}
+        <table class="cart-table">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Quantity</th>
+              <th>Total</th>
+              <th><span class="visually-hidden">Remove</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in cart.items %}
+              <tr>
+                <td>
+                  <div class="cart-item__product">
+                    <div class="cart-item__image">
+                      {% if item.image %}
+                        <img
+                          src="{{ item.image | image_url: width: 200 }}"
+                          alt="{{ item.image.alt | default: item.product.title | escape }}"
+                          width="200"
+                          height="200"
+                          loading="lazy"
+                        >
+                      {% endif %}
+                    </div>
+                    <div>
+                      <a href="{{ item.url }}" style="font-weight: 600;">{{ item.product.title }}</a>
+                      {% unless item.variant.title == 'Default Title' %}
+                        <div style="color: var(--color-text-muted); font-size: 0.85rem;">{{ item.variant.title }}</div>
+                      {% endunless %}
+                      <div style="margin-top: 0.25rem;">{{ item.final_price | money }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="quantity-input">
+                    <button type="button" data-quantity-decrease aria-label="Decrease quantity">&minus;</button>
+                    <input
+                      type="number"
+                      name="updates[]"
+                      value="{{ item.quantity }}"
+                      min="0"
+                      inputmode="numeric"
+                      aria-label="Quantity for {{ item.product.title | escape }}"
+                    >
+                    <button type="button" data-quantity-increase aria-label="Increase quantity">&plus;</button>
+                  </div>
+                </td>
+                <td>{{ item.final_line_price | money }}</td>
+                <td>
+                  <a href="{{ item.url_to_remove }}" class="cart-item__remove">Remove</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+        <button type="submit" name="update" class="btn btn--secondary" style="margin-top: var(--space-3);">
+          Update cart
+        </button>
+      {% endform %}
+
+      <div class="cart-summary">
+        <div class="cart-summary__row">
+          <span>Subtotal</span>
+          <span>{{ cart.total_price | money }}</span>
+        </div>
+        <p style="color: var(--color-text-muted); font-size: 0.85rem;">
+          Taxes and shipping calculated at checkout.
+        </p>
+        <div class="cart-summary__row cart-summary__total">
+          <span>Estimated total</span>
+          <span>{{ cart.total_price | money }}</span>
+        </div>
+        <form action="{{ routes.cart_url }}" method="post">
+          <button type="submit" name="checkout" class="btn btn--primary btn--full">Checkout</button>
+        </form>
+      </div>
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <p>Your cart is empty.</p>
+      <a href="{{ routes.all_products_collection_url }}" class="btn btn--primary">Continue shopping</a>
+    </div>
+  {% endif %}
+</div>
+
+{% schema %}
+{
+  "name": "Cart page",
+  "settings": []
+}
+{% endschema %}

@@ -1,9 +1,9 @@
 {
   "sections": {
-    "main": {
-      "type": "main-placeholder",
+    "featured": {
+      "type": "featured-products",
       "settings": {}
     }
   },
-  "order": ["main"]
+  "order": ["featured"]
 }

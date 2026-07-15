@@ -1,0 +1,105 @@
+<div class="page-width product-page">
+  <div class="product-gallery">
+    <div class="product-gallery__main">
+      {% if product.featured_image %}
+        <img
+          src="{{ product.featured_image | image_url: width: 1200 }}"
+          alt="{{ product.featured_image.alt | default: product.title | escape }}"
+          width="1200"
+          height="1200"
+          id="ProductMainImage"
+          loading="eager"
+        >
+      {% else %}
+        <div class="visually-hidden">No image available</div>
+      {% endif %}
+    </div>
+
+    {% if product.images.size > 1 %}
+      <div class="product-gallery__thumbs" data-product-thumbs>
+        {% for image in product.images %}
+          <button
+            type="button"
+            class="product-gallery__thumb {% if forloop.first %}is-active{% endif %}"
+            data-full-src="{{ image | image_url: width: 1200 }}"
+            aria-label="Show image {{ forloop.index }}"
+          >
+            <img src="{{ image | image_url: width: 150 }}" alt="" width="150" height="150" loading="lazy">
+          </button>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="product-info">
+    {% if product.type != blank %}
+      <div class="product-info__category">{{ product.type }}</div>
+    {% endif %}
+
+    <h1>{{ product.title }}</h1>
+
+    <div class="product-info__price" id="ProductPrice">
+      {% render 'price', product: product %}
+    </div>
+
+    {% form 'product', product, id: 'ProductForm' %}
+      {% unless product.has_only_default_variant %}
+        {% for option in product.options_with_values %}
+          <div class="field">
+            <label for="ProductOption-{{ option.position }}">{{ option.name }}</label>
+            <select name="options[{{ option.name | escape }}]" id="ProductOption-{{ option.position }}" data-option-select>
+              {% for value in option.values %}
+                <option value="{{ value | escape }}" {% if value == option.selected_value %}selected{% endif %}>
+                  {{ value }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+        {% endfor %}
+        <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}" id="ProductVariantId">
+      {% else %}
+        <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+      {% endunless %}
+
+      <div class="product-form__row">
+        <div class="field" style="margin-bottom: 0;">
+          <label for="ProductQuantity">Quantity</label>
+          <div class="quantity-input">
+            <button type="button" data-quantity-decrease aria-label="Decrease quantity">&minus;</button>
+            <input type="number" id="ProductQuantity" name="quantity" value="1" min="1" inputmode="numeric">
+            <button type="button" data-quantity-increase aria-label="Increase quantity">&plus;</button>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn--primary btn--full" data-add-to-cart-button {% unless product.selected_or_first_available_variant.available %}disabled{% endunless %}>
+        {% if product.selected_or_first_available_variant.available %}
+          Add to cart
+        {% else %}
+          Sold out
+        {% endif %}
+      </button>
+    {% endform %}
+
+    {% if product.description != blank %}
+      <div class="product-info__description">
+        {{ product.description }}
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{% comment %}
+  Minimal data island for global.js's variant picker — avoids a network
+  request just to know which variant a given option combination maps to.
+{% endcomment %}
+<script type="application/json" id="ProductVariantsJson">
+  {{ product.variants | json }}
+</script>
+
+{% schema %}
+{
+  "name": "Product page",
+  "settings": []
+}
+{% endschema %}

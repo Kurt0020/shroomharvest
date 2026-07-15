@@ -1,0 +1,11 @@
+{% comment %}
+  Renders a product's price, with a compare-at (sale) price when applicable.
+  Accepts: product (required)
+{% endcomment %}
+
+<span class="price {% if product.compare_at_price > product.price %}price--sale{% endif %}">
+  {{ product.price | money }}
+</span>
+{% if product.compare_at_price > product.price %}
+  <span class="price--compare">{{ product.compare_at_price | money }}</span>
+{% endif %}

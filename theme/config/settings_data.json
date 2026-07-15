@@ -1,3 +1,14 @@
 {
-  "current": "Default"
+  "current": "Default",
+  "presets": {
+    "Default": {
+      "color_bg": "#F7F4EC",
+      "color_text": "#17211A",
+      "color_primary": "#1F3D2B",
+      "color_accent": "#B0592E",
+      "color_sage": "#5F7D63",
+      "heading_font_style": "serif",
+      "page_width": 1200
+    }
+  }
 }

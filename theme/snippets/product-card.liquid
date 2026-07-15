@@ -1,0 +1,40 @@
+{% comment %}
+  Renders a single product card.
+  Accepts: product (required)
+{% endcomment %}
+
+<a href="{{ product.url }}" class="product-card">
+  <div class="product-card__media">
+    {% if product.featured_image %}
+      <img
+        src="{{ product.featured_image | image_url: width: 600 }}"
+        srcset="
+          {{ product.featured_image | image_url: width: 300 }} 300w,
+          {{ product.featured_image | image_url: width: 600 }} 600w,
+          {{ product.featured_image | image_url: width: 900 }} 900w
+        "
+        sizes="(min-width: 990px) 25vw, (min-width: 620px) 33vw, 50vw"
+        alt="{{ product.featured_image.alt | default: product.title | escape }}"
+        width="600"
+        height="600"
+        loading="lazy"
+      >
+    {% else %}
+      <div class="visually-hidden">No image available for {{ product.title }}</div>
+    {% endif %}
+
+    {% if product.compare_at_price > product.price %}
+      <span class="badge badge--sale product-card__badge">Sale</span>
+    {% elsif product.available == false %}
+      <span class="badge badge--sold-out product-card__badge">Sold out</span>
+    {% endif %}
+  </div>
+
+  <div class="product-card__body">
+    {% if product.type != blank %}
+      <span class="product-card__category">{{ product.type }}</span>
+    {% endif %}
+    <span class="product-card__title">{{ product.title }}</span>
+    {% render 'price', product: product %}
+  </div>
+</a>

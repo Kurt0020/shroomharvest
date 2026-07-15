@@ -1,0 +1,84 @@
+<div class="page-width">
+  <div class="collection-header">
+    {% if collection.image %}
+      <div style="border-radius: var(--radius-lg); overflow: hidden; margin-bottom: var(--space-3); aspect-ratio: 16/5; max-height: 260px;">
+        <img
+          src="{{ collection.image | image_url: width: 1600 }}"
+          alt="{{ collection.title | escape }}"
+          width="1600"
+          height="500"
+          style="width: 100%; height: 100%; object-fit: cover;"
+          loading="eager"
+        >
+      </div>
+    {% endif %}
+    <h1>{{ collection.title }}</h1>
+    {% if collection.description != blank %}
+      <div class="collection-header__description">{{ collection.description }}</div>
+    {% endif %}
+  </div>
+
+  {% paginate collection.products by section.settings.products_per_page %}
+    <div class="collection-toolbar">
+      <span>{{ collection.products_count }} product{{ collection.products_count | pluralize: '', 's' }}</span>
+
+      <form method="get" action="{{ collection.url }}">
+        <label for="SortBy" class="visually-hidden">Sort by</label>
+        <select name="sort_by" id="SortBy" onchange="this.form.submit()">
+          {% for option in collection.sort_options %}
+            <option value="{{ option.value }}" {% if option.value == collection.sort_by %}selected{% endif %}>
+              {{ option.name }}
+            </option>
+          {% endfor %}
+        </select>
+      </form>
+    </div>
+
+    {% if collection.products.size > 0 %}
+      <div class="product-grid">
+        {% for product in collection.products %}
+          {% render 'product-card', product: product %}
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <p>No products found in this collection yet.</p>
+      </div>
+    {% endif %}
+
+    {% if paginate.pages > 1 %}
+      <nav class="pagination" aria-label="Pagination">
+        {% if paginate.previous %}
+          <a href="{{ paginate.previous.url }}" aria-label="Previous page">&larr;</a>
+        {% endif %}
+        {% for part in paginate.parts %}
+          {% if part.is_link %}
+            <a href="{{ part.url }}">{{ part.title }}</a>
+          {% else %}
+            <span class="{% if part.title == paginate.current_page %}is-current{% endif %}">{{ part.title }}</span>
+          {% endif %}
+        {% endfor %}
+        {% if paginate.next %}
+          <a href="{{ paginate.next.url }}" aria-label="Next page">&rarr;</a>
+        {% endif %}
+      </nav>
+    {% endif %}
+  {% endpaginate %}
+</div>
+
+{% schema %}
+{
+  "name": "Collection page",
+  "settings": [
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "Products per page",
+      "min": 8,
+      "max": 48,
+      "step": 4,
+      "default": 16
+    }
+  ]
+}
+{% endschema %}

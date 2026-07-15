@@ -12,24 +12,42 @@
     {% endif %}
 
     <link rel="canonical" href="{{ canonical_url }}">
+    <meta name="theme-color" content="{{ settings.color_primary }}">
     {{ content_for_header }}
 
     {{ 'base.css' | asset_url | stylesheet_tag }}
+
+    {% comment %}
+      Theme settings (Colors panel in the theme editor) override the static
+      defaults in base.css via CSS custom properties, so merchants can
+      retint the storefront without touching code.
+    {% endcomment %}
+    {% style %}
+      :root {
+        --color-bg: {{ settings.color_bg }};
+        --color-text: {{ settings.color_text }};
+        --color-primary: {{ settings.color_primary }};
+        --color-accent: {{ settings.color_accent }};
+        --color-sage: {{ settings.color_sage }};
+        --page-max-width: {{ settings.page_width }}px;
+        {% if settings.heading_font_style == 'sans' %}
+          --font-heading: var(--font-body);
+        {% endif %}
+      }
+    {% endstyle %}
   </head>
   <body>
     <a class="visually-hidden skip-to-content-link" href="#MainContent">
       Skip to content
     </a>
 
-    {% comment %}
-      Header / footer sections and full page content are built out in
-      Module 8 (Shopify Theme) and Module 9 (Custom Sections). This is a
-      valid, minimal layout so `shopify theme dev` can preview immediately.
-    {% endcomment %}
+    {% section 'header' %}
 
     <main id="MainContent">
       {{ content_for_layout }}
     </main>
+
+    {% section 'footer' %}
 
     {{ 'global.js' | asset_url | script_tag }}
   </body>

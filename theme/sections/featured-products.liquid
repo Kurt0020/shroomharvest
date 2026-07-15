@@ -1,0 +1,82 @@
+<div class="page-width section-padding">
+  <div class="section-heading">
+    {% if section.settings.eyebrow != blank %}
+      <div class="section-heading__eyebrow">{{ section.settings.eyebrow }}</div>
+    {% endif %}
+    <h2>{{ section.settings.heading }}</h2>
+    {% if section.settings.subheading != blank %}
+      <p style="color: var(--color-text-muted);">{{ section.settings.subheading }}</p>
+    {% endif %}
+  </div>
+
+  {% assign featured_collection = collections[section.settings.collection] %}
+
+  {% if featured_collection and featured_collection.products.size > 0 %}
+    <div class="product-grid">
+      {% for product in featured_collection.products limit: section.settings.products_to_show %}
+        {% render 'product-card', product: product %}
+      {% endfor %}
+    </div>
+
+    {% if section.settings.show_view_all %}
+      <div style="text-align: center; margin-top: var(--space-4);">
+        <a href="{{ featured_collection.url }}" class="btn btn--secondary">View all</a>
+      </div>
+    {% endif %}
+  {% else %}
+    <div class="empty-state">
+      <p>Select a collection in the theme editor to feature products here.</p>
+    </div>
+  {% endif %}
+</div>
+
+{% schema %}
+{
+  "name": "Featured products",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow text",
+      "default": "Fresh from the farm"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Featured products"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "A few of our best-loved gourmet and wellness picks."
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "label": "Products to show",
+      "min": 4,
+      "max": 12,
+      "step": 4,
+      "default": 8
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show \"View all\" button",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured products"
+    }
+  ]
+}
+{% endschema %}

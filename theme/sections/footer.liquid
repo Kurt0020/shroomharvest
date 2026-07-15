@@ -1,0 +1,100 @@
+<footer class="site-footer">
+  <div class="page-width footer-grid">
+    <div>
+      <h4>{{ shop.name }}</h4>
+      <p>{{ section.settings.about_text }}</p>
+    </div>
+
+    <div>
+      <h4>{{ section.settings.links_1_title }}</h4>
+      <ul class="footer-links">
+        {% for link in section.settings.links_1.links %}
+          <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div>
+      <h4>{{ section.settings.links_2_title }}</h4>
+      <ul class="footer-links">
+        {% for link in section.settings.links_2.links %}
+          <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="footer-newsletter">
+      <h4>{{ section.settings.newsletter_title }}</h4>
+      <p>{{ section.settings.newsletter_subtext }}</p>
+      {% form 'customer', class: 'field' %}
+        <input type="hidden" name="contact[tags]" value="newsletter">
+        <label for="NewsletterEmail" class="visually-hidden">Email address</label>
+        <input
+          type="email"
+          id="NewsletterEmail"
+          name="contact[email]"
+          placeholder="you@example.com"
+          required
+        >
+        {% if form.posted_successfully? %}
+          <p class="badge" style="margin-top: 0.5rem;">Thanks — you're subscribed.</p>
+        {% endif %}
+        <button type="submit" class="btn btn--primary btn--full" style="margin-top: 0.6rem;">Subscribe</button>
+      {% endform %}
+    </div>
+  </div>
+
+  <div class="page-width site-footer__bottom">
+    <span>&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. All rights reserved.</span>
+    <span>Gourmet, medicinal &amp; home-growing mushroom products.</span>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Footer",
+  "settings": [
+    {
+      "type": "textarea",
+      "id": "about_text",
+      "label": "About text",
+      "default": "Gourmet, medicinal, and home-growing mushroom products — grown, dried, and blended with care."
+    },
+    {
+      "type": "text",
+      "id": "links_1_title",
+      "label": "First link list title",
+      "default": "Shop"
+    },
+    {
+      "type": "link_list",
+      "id": "links_1",
+      "label": "First link list",
+      "default": "footer"
+    },
+    {
+      "type": "text",
+      "id": "links_2_title",
+      "label": "Second link list title",
+      "default": "Support"
+    },
+    {
+      "type": "link_list",
+      "id": "links_2",
+      "label": "Second link list"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_title",
+      "label": "Newsletter title",
+      "default": "Stay in the loop"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_subtext",
+      "label": "Newsletter subtext",
+      "default": "New harvests, grow-kit tips, and seasonal blends — no spam."
+    }
+  ]
+}
+{% endschema %}
