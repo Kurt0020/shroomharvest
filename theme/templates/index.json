@@ -1,9 +1,57 @@
 {
   "sections": {
+    "hero": {
+      "type": "hero-banner",
+      "settings": {}
+    },
+    "categories": {
+      "type": "featured-categories",
+      "settings": {},
+      "blocks": {
+        "cat-1": { "type": "category", "settings": { "title": "Fresh Mushrooms" } },
+        "cat-2": { "type": "category", "settings": { "title": "Dried Mushrooms" } },
+        "cat-3": { "type": "category", "settings": { "title": "Mushroom Coffee" } },
+        "cat-4": { "type": "category", "settings": { "title": "Mushroom Tea" } },
+        "cat-5": { "type": "category", "settings": { "title": "Powders & Supplements" } },
+        "cat-6": { "type": "category", "settings": { "title": "Grow Kits" } }
+      },
+      "block_order": ["cat-1", "cat-2", "cat-3", "cat-4", "cat-5", "cat-6"]
+    },
     "featured": {
       "type": "featured-products",
       "settings": {}
+    },
+    "benefits": {
+      "type": "mushroom-benefits",
+      "settings": {},
+      "blocks": {
+        "benefit-1": { "type": "benefit", "settings": { "icon": "immune", "title": "Immune support", "text": "Reishi and Turkey Tail are prized for their beta-glucan content." } },
+        "benefit-2": { "type": "benefit", "settings": { "icon": "focus", "title": "Focus & clarity", "text": "Lion's Mane is a favorite for sustained, jitter-free focus." } },
+        "benefit-3": { "type": "benefit", "settings": { "icon": "energy", "title": "Natural energy", "text": "Cordyceps blends offer a gentler lift than a third cup of coffee." } },
+        "benefit-4": { "type": "benefit", "settings": { "icon": "grow", "title": "Grow your own", "text": "Our beginner-friendly kits fruit in as little as 10 days." } }
+      },
+      "block_order": ["benefit-1", "benefit-2", "benefit-3", "benefit-4"]
+    },
+    "reviews": {
+      "type": "customer-reviews",
+      "settings": {},
+      "blocks": {
+        "review-1": { "type": "review", "settings": { "author": "Jamie R.", "location": "Portland, OR" } },
+        "review-2": { "type": "review", "settings": { "author": "Priya K.", "location": "Austin, TX" } },
+        "review-3": { "type": "review", "settings": { "author": "Sam T.", "location": "Burlington, VT" } }
+      },
+      "block_order": ["review-1", "review-2", "review-3"]
+    },
+    "faq": {
+      "type": "faq",
+      "settings": {},
+      "blocks": {
+        "q-1": { "type": "question", "settings": { "question": "How should I store fresh mushrooms?" } },
+        "q-2": { "type": "question", "settings": { "question": "How long do grow kits take to fruit?", "answer": "<p>Most kits fruit within 7-14 days of unboxing, given indirect light and a light daily misting.</p>" } },
+        "q-3": { "type": "question", "settings": { "question": "Are your supplements third-party tested?", "answer": "<p>Yes — every batch is tested for potency and purity before it ships.</p>" } }
+      },
+      "block_order": ["q-1", "q-2", "q-3"]
     }
   },
-  "order": ["featured"]
+  "order": ["hero", "categories", "featured", "benefits", "reviews", "faq"]
 }

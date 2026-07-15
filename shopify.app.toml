@@ -2,7 +2,7 @@
 
 client_id = "45e553a0fbbdb094fd055b00b94eab1d"
 name = "shroomharvest"
-application_url = "https://examines-just-trades-chassis.trycloudflare.com"
+application_url = "https://patients-reliance-wall-garden.trycloudflare.com"
 embedded = true
 
 [webhooks]
@@ -14,7 +14,8 @@ scopes = "read_inventory,read_orders,read_products,write_inventory,write_product
 use_legacy_install_flow = false
 
 [auth]
-redirect_urls = [ "https://examines-just-trades-chassis.trycloudflare.com" ]
+redirect_urls = [ "https://patients-reliance-wall-garden.trycloudflare.com" ]
+
 
 
 

@@ -120,4 +120,29 @@
       });
     });
   }
+  /* -----------------------------------------------------------------
+     Customer reviews carousel — prev/next buttons scroll the track.
+     Works without JS too: it's a native horizontally-scrollable/swipeable
+     element (scroll-snap in CSS) even with these buttons removed.
+     ----------------------------------------------------------------- */
+  document.querySelectorAll("[data-reviews-track]").forEach(function (track) {
+    var wrap = track.closest(".reviews-carousel-wrap");
+    if (!wrap) return;
+
+    var prevBtn = wrap.querySelector("[data-reviews-prev]");
+    var nextBtn = wrap.querySelector("[data-reviews-next]");
+    var firstCard = track.querySelector(".review-card");
+    var scrollAmount = firstCard ? firstCard.offsetWidth + 24 : 320;
+
+    if (prevBtn) {
+      prevBtn.addEventListener("click", function () {
+        track.scrollBy({ left: -scrollAmount, behavior: "smooth" });
+      });
+    }
+    if (nextBtn) {
+      nextBtn.addEventListener("click", function () {
+        track.scrollBy({ left: scrollAmount, behavior: "smooth" });
+      });
+    }
+  });
 })();

@@ -1,0 +1,80 @@
+<section class="hero" style="--hero-overlay: {{ section.settings.overlay_opacity | divided_by: 100.0 }};">
+  {% if section.settings.image %}
+    <img
+      class="hero__image"
+      src="{{ section.settings.image | image_url: width: 2000 }}"
+      srcset="
+        {{ section.settings.image | image_url: width: 750 }} 750w,
+        {{ section.settings.image | image_url: width: 1400 }} 1400w,
+        {{ section.settings.image | image_url: width: 2000 }} 2000w
+      "
+      sizes="100vw"
+      alt=""
+      width="2000"
+      height="{{ 2000 | divided_by: section.settings.image.aspect_ratio }}"
+      loading="eager"
+    >
+  {% endif %}
+
+  <div class="hero__overlay"></div>
+
+  <div class="page-width hero__content">
+    {% if section.settings.eyebrow != blank %}
+      <div class="section-heading__eyebrow hero__eyebrow">{{ section.settings.eyebrow }}</div>
+    {% endif %}
+    <h1 class="hero__heading">{{ section.settings.heading }}</h1>
+    {% if section.settings.subheading != blank %}
+      <p class="hero__subheading">{{ section.settings.subheading }}</p>
+    {% endif %}
+
+    <div class="hero__actions">
+      {% if section.settings.primary_button_label != blank %}
+        <a href="{{ section.settings.primary_button_link | default: '#' }}" class="btn btn--primary">
+          {{ section.settings.primary_button_label }}
+        </a>
+      {% endif %}
+      {% if section.settings.secondary_button_label != blank %}
+        <a href="{{ section.settings.secondary_button_link | default: '#' }}" class="btn btn--secondary hero__secondary-btn">
+          {{ section.settings.secondary_button_label }}
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Hero banner",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Background image" },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Image overlay darkness",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "default": 35
+    },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow text", "default": "Grown with care, shipped with pride" },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Gourmet & medicinal mushrooms, from farm to table"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Fresh and dried mushrooms, wellness blends, and home-growing kits — sourced from small growers who take the craft seriously."
+    },
+    { "type": "text", "id": "primary_button_label", "label": "Primary button label", "default": "Shop all products" },
+    { "type": "url", "id": "primary_button_link", "label": "Primary button link" },
+    { "type": "text", "id": "secondary_button_label", "label": "Secondary button label", "default": "Take the mushroom finder quiz" },
+    { "type": "url", "id": "secondary_button_link", "label": "Secondary button link" }
+  ],
+  "presets": [{ "name": "Hero banner" }]
+}
+{% endschema %}
