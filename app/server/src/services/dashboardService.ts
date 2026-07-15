@@ -1,23 +1,8 @@
 import { and, desc, eq, sql } from "drizzle-orm";
 import { db } from "../db/client.js";
 import { activityLogs, inventory, products, suppliers } from "../db/schema.js";
-
-/**
- * The Inventory Health Score here is intentionally a simplified placeholder:
- * the share of active inventory that isn't low/out of stock, expressed as
- * 0-100. Module 7 (Recommendation Engine) replaces this with the real
- * weighted formula (current inventory, sales velocity, days remaining,
- * supplier lead time). This module's job is proving the dashboard's shape
- * — KPI cards, lists, and a chart — works end to end against real data.
- */
-function computeHealthScore(counts: { inStock: number; lowStock: number; outOfStock: number }) {
-  const total = counts.inStock + counts.lowStock + counts.outOfStock;
-  if (total === 0) return 100;
-  // Out-of-stock hurts twice as much as low-stock in this simplified model.
-  const penalized = counts.lowStock * 0.5 + counts.outOfStock * 1;
-  const score = Math.round(100 * (1 - penalized / total));
-  return Math.max(0, Math.min(100, score));
-}
+import { getShopHealthScore } from "./recommendationService.js";
+import { listRecommendations } from "./recommendationService.js";
 
 export async function getDashboardSummary(shopId: number) {
   const shopInventory = await db
@@ -43,7 +28,13 @@ export async function getDashboardSummary(shopId: number) {
     totalInventoryValue += unitCost * row.inventory.quantityOnHand;
   }
 
-  const healthScore = computeHealthScore(counts);
+  // Module 7's real weighted formula (sales velocity, days remaining,
+  // supplier lead time) replaces Module 4's "share of healthy inventory"
+  // placeholder. Lives in recommendationService.ts / recommendationEngine.ts
+  // since the dashboard and the recommendations table both need the same
+  // per-item scoring — one calculation, two consumers.
+  const healthScore = await getShopHealthScore(shopId);
+  const smartRecommendations = await listRecommendations(shopId, { limit: 6, includeResolved: false });
 
   const bySalesVelocity = [...shopInventory].sort(
     (a, b) => Number(b.inventory.avgDailySales ?? 0) - Number(a.inventory.avgDailySales ?? 0)
@@ -97,5 +88,6 @@ export async function getDashboardSummary(shopId: number) {
     restockPriorities,
     categoryBreakdown,
     recentActivity,
+    smartRecommendations,
   };
 }

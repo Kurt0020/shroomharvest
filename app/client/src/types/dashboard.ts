@@ -99,3 +99,26 @@ export interface DashboardSummary {
   categoryBreakdown: CategoryBreakdownEntry[];
   recentActivity: ActivityLogEntry[];
 }
+
+export type RecommendationType =
+  | "restock_urgent"
+  | "restock_soon"
+  | "increase_before_demand"
+  | "reduce_reorder_quantity"
+  | "supplier_lead_time_risk";
+
+export type RecommendationPriority = "low" | "medium" | "high" | "critical";
+
+export interface Recommendation {
+  id: number;
+  shopId: number;
+  productId: number;
+  inventoryId: number;
+  type: RecommendationType;
+  message: string;
+  priority: RecommendationPriority;
+  healthScoreAtGeneration: number | null;
+  isResolved: boolean;
+  resolvedAt: string | null;
+  createdAt: string;
+}

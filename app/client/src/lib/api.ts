@@ -1,4 +1,4 @@
-import type { ActivityLogEntry, DashboardSummary, InventoryRow, Paginated, Supplier } from "../types/dashboard.js";
+import type { ActivityLogEntry, DashboardSummary, InventoryRow, Paginated, Recommendation, Supplier } from "../types/dashboard.js";
 
 export class ApiError extends Error {
   constructor(
@@ -13,6 +13,10 @@ export class ApiError extends Error {
  * Plain fetch is enough here — App Bridge 4's CDN script auto-attaches the
  * session token to same-origin requests (see Module 2). No custom wrapper
  * needed.
+ *
+ * Explicitly handles 204/empty bodies (e.g. resolveRecommendation below) —
+ * calling res.json() on an empty body throws "Unexpected end of JSON
+ * input", the same class of bug fixed in verifyRequest.ts back in Module 2.
  */
 async function apiFetch<T>(input: string, init?: RequestInit): Promise<T> {
   const res = await fetch(input, {
@@ -23,6 +27,10 @@ async function apiFetch<T>(input: string, init?: RequestInit): Promise<T> {
   if (!res.ok) {
     const body = await res.json().catch(() => null);
     throw new ApiError(body?.error?.message ?? `Request failed with status ${res.status}`, res.status);
+  }
+
+  if (res.status === 204) {
+    return undefined as T;
   }
 
   return res.json() as Promise<T>;
@@ -128,4 +136,43 @@ export async function fetchActivity(filters: ActivityFilters = {}): Promise<Pagi
   if (filters.page) params.set("page", String(filters.page));
 
   return apiFetch<Paginated<ActivityLogEntry>>(`/api/activity?${params.toString()}`);
+}
+
+export interface RecommendationFilters {
+  priority?: string;
+  includeResolved?: boolean;
+  limit?: number;
+}
+
+export async function fetchRecommendations(filters: RecommendationFilters = {}): Promise<Recommendation[]> {
+  const params = new URLSearchParams();
+  if (filters.priority) params.set("priority", filters.priority);
+  if (filters.includeResolved) params.set("includeResolved", "true");
+  params.set("limit", String(filters.limit ?? 50));
+
+  const body = await apiFetch<{ data: Recommendation[] }>(`/api/recommendations?${params.toString()}`);
+  return body.data;
+}
+
+export interface GenerateRecommendationsResult {
+  created: number;
+  resolved: number;
+  itemsScored: number;
+}
+
+/**
+ * Runs the recommendation engine on demand — there's no background job
+ * scheduler in this project, so a merchant (or the dashboard) triggers a
+ * fresh reconciliation pass manually. See recommendationService.ts for the
+ * actual engine logic.
+ */
+export async function generateRecommendations(): Promise<GenerateRecommendationsResult> {
+  const body = await apiFetch<{ data: GenerateRecommendationsResult }>("/api/recommendations/generate", {
+    method: "POST",
+  });
+  return body.data;
+}
+
+export async function resolveRecommendation(id: number): Promise<void> {
+  await apiFetch<void>(`/api/recommendations/${id}/resolve`, { method: "POST" });
 }

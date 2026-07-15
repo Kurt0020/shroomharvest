@@ -14,7 +14,7 @@ import {
 } from "@shopify/polaris";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { fetchDashboardSummary } from "../lib/api.js";
-import type { DashboardSummary, InventoryRow } from "../types/dashboard.js";
+import type { DashboardSummary, InventoryRow, Recommendation } from "../types/dashboard.js";
 
 const CATEGORY_LABELS: Record<string, string> = {
   fresh_mushrooms: "Fresh Mushrooms",
@@ -90,6 +90,34 @@ function InventoryRowList({ rows, emptyMessage }: { rows: InventoryRow[]; emptyM
   );
 }
 
+const PRIORITY_TONE: Record<Recommendation["priority"], "critical" | "warning" | "info" | "success"> = {
+  critical: "critical",
+  high: "warning",
+  medium: "info",
+  low: "success",
+};
+
+function RecommendationList({ items }: { items: Recommendation[] }) {
+  if (items.length === 0) {
+    return (
+      <Text as="p" tone="subdued">
+        No open recommendations — everything's on track.
+      </Text>
+    );
+  }
+
+  return (
+    <BlockStack gap="300">
+      {items.map((rec) => (
+        <InlineStack key={rec.id} align="space-between" blockAlign="start" gap="300">
+          <Text as="p">{rec.message}</Text>
+          <Badge tone={PRIORITY_TONE[rec.priority]}>{rec.priority}</Badge>
+        </InlineStack>
+      ))}
+    </BlockStack>
+  );
+}
+
 export default function Dashboard() {
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -150,9 +178,20 @@ export default function Dashboard() {
               </InlineStack>
               <ProgressBar progress={summary.healthScore} tone={healthScoreProgressTone(summary.healthScore)} size="small" />
               <Text as="p" variant="bodySm" tone="subdued">
-                A simplified score based on the share of inventory that isn't low or out of stock. The full
-                weighted model (sales velocity, days remaining, supplier lead time) lands in Module 7.
+                Weighted from sales velocity, days of stock remaining, and each product's supplier lead
+                time — a low score means it's at risk of running out before a reorder could arrive.
               </Text>
+            </BlockStack>
+          </Card>
+        </Layout.Section>
+
+        <Layout.Section>
+          <Card>
+            <BlockStack gap="300">
+              <Text as="h2" variant="headingMd">
+                Smart recommendations
+              </Text>
+              <RecommendationList items={summary.smartRecommendations} />
             </BlockStack>
           </Card>
         </Layout.Section>

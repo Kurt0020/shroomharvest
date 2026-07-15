@@ -1,15 +1,17 @@
 import { useState } from "react";
-import { Tabs } from "@shopify/polaris";
+import { Frame, Tabs } from "@shopify/polaris";
 import Dashboard from "./pages/Dashboard.js";
 import InventoryPage from "./pages/InventoryPage.js";
 import SuppliersPage from "./pages/SuppliersPage.js";
 import ActivityPage from "./pages/ActivityPage.js";
+import RecommendationsPage from "./pages/RecommendationsPage.js";
 
 const TABS = [
   { id: "dashboard", content: "Dashboard" },
   { id: "inventory", content: "Inventory" },
   { id: "suppliers", content: "Suppliers" },
   { id: "activity", content: "Activity" },
+  { id: "recommendations", content: "Recommendations" },
 ];
 
 /**
@@ -24,12 +26,13 @@ export default function App() {
   const [selected, setSelected] = useState(0);
 
   return (
-    <>
+    <Frame>
       <Tabs tabs={TABS} selected={selected} onSelect={setSelected} />
       {selected === 0 && <Dashboard />}
       {selected === 1 && <InventoryPage />}
       {selected === 2 && <SuppliersPage />}
       {selected === 3 && <ActivityPage />}
-    </>
+      {selected === 4 && <RecommendationsPage />}
+    </Frame>
   );
 }
