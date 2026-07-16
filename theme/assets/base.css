@@ -1103,3 +1103,97 @@ textarea:focus {
 .faq-item__answer p:last-child {
   margin-bottom: 0;
 }
+
+/* =========================================================================
+   Module 10 — Mushroom Finder Quiz
+   ========================================================================= */
+
+.quiz__card {
+  max-width: 640px;
+  margin: 0 auto;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  position: relative;
+}
+
+.quiz__progress {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--color-bg-alt);
+  overflow: hidden;
+  margin-bottom: var(--space-2);
+}
+
+.quiz__progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--color-accent);
+  transition: width 0.25s ease;
+}
+
+.quiz__step-label {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: var(--space-3);
+}
+
+.quiz__question-text {
+  text-align: center;
+  margin-bottom: var(--space-3);
+}
+
+.quiz__answers {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 550px) {
+  .quiz__answers {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.quiz__answer {
+  background: var(--color-bg-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 0.9rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--color-text);
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+.quiz__answer:hover {
+  border-color: var(--color-accent);
+  background: var(--color-surface);
+}
+
+.quiz__back {
+  display: inline-block;
+  margin-top: var(--space-3);
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 0;
+}
+.quiz__back:hover {
+  color: var(--color-primary);
+}
+
+.quiz__results {
+  max-width: 900px;
+  margin: var(--space-5) auto 0;
+  text-align: center;
+}
+
+.quiz__results-empty {
+  text-align: center;
+  margin-top: var(--space-3);
+}

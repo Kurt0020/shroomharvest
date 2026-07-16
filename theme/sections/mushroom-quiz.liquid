@@ -1,0 +1,182 @@
+<div class="page-width section-padding quiz" data-quiz-root data-tag-prefix="{{ section.settings.tag_prefix }}">
+  <div class="section-heading">
+    {% if section.settings.eyebrow != blank %}
+      <div class="section-heading__eyebrow">{{ section.settings.eyebrow }}</div>
+    {% endif %}
+    <h1>{{ section.settings.heading }}</h1>
+    {% if section.settings.subheading != blank %}
+      <p style="color: var(--color-text-muted);">{{ section.settings.subheading }}</p>
+    {% endif %}
+  </div>
+
+  {% comment %}
+    ---------------------------------------------------------------
+    Quiz UI — one step visible at a time, JS-driven. Each question is a
+    section block so a merchant can add/remove/reorder/reword questions
+    in the theme editor without touching code. Every question offers the
+    same six goals in the same order (Cooking / Wellness / Immune Support
+    / Focus / Energy / Home Growing) — only the label text changes per
+    question — so scoring is a simple position-based tally in JS.
+    ---------------------------------------------------------------
+  {% endcomment %}
+  <div class="quiz__card" data-quiz-card>
+    <div class="quiz__progress">
+      <div class="quiz__progress-bar" data-quiz-progress-bar></div>
+    </div>
+    <p class="quiz__step-label" data-quiz-step-label></p>
+
+    {% for block in section.blocks %}
+      <div
+        class="quiz__question"
+        data-quiz-question
+        data-question-index="{{ forloop.index0 }}"
+        {% if forloop.index0 != 0 %}hidden{% endif %}
+        {{ block.shopify_attributes }}
+      >
+        <h2 class="quiz__question-text">{{ block.settings.question }}</h2>
+        <div class="quiz__answers">
+          {% assign goals = "cooking,wellness,immune,focus,energy,growing" | split: "," %}
+          {% assign labels = block.settings.answer_cooking | append: '|' | append: block.settings.answer_wellness | append: '|' | append: block.settings.answer_immune | append: '|' | append: block.settings.answer_focus | append: '|' | append: block.settings.answer_energy | append: '|' | append: block.settings.answer_growing | split: '|' %}
+          {% for goal in goals %}
+            <button type="button" class="quiz__answer" data-quiz-answer data-goal="{{ goal }}">
+              {{ labels[forloop.index0] }}
+            </button>
+          {% endfor %}
+        </div>
+      </div>
+    {% endfor %}
+
+    <button type="button" class="quiz__back" data-quiz-back hidden>&larr; Back</button>
+  </div>
+
+  <div class="quiz__results" data-quiz-results hidden>
+    <h2 data-quiz-results-heading></h2>
+    <p data-quiz-results-subheading style="color: var(--color-text-muted);"></p>
+    <div class="product-grid" data-quiz-results-grid></div>
+    <div class="quiz__results-empty" data-quiz-results-empty hidden>
+      <p>We don't have a tagged match for that goal yet — here's everything we've got.</p>
+      <a href="{{ section.settings.fallback_collection.url | default: routes.all_products_collection_url }}" class="btn btn--secondary">
+        Shop all products
+      </a>
+    </div>
+    <button type="button" class="btn btn--secondary" data-quiz-retake style="margin-top: var(--space-3);">
+      Retake the quiz
+    </button>
+  </div>
+</div>
+
+{% comment %}
+  Product data island for client-side matching. Scoped to a merchant-
+  chosen collection (defaults to "All products") rather than the entire
+  catalog, so a large store doesn't ship its whole product list to every
+  quiz page load.
+{% endcomment %}
+
+{% assign quiz_collection = section.settings.product_source %}
+
+{% if quiz_collection == blank %}
+  {% assign quiz_collection = collections.all %}
+{% endif %}
+
+<script type="application/json" data-quiz-products>
+  [
+    {% for product in quiz_collection.products %}
+      {
+        "title": {{ product.title | json }},
+        "url": {{ product.url | json }},
+        "image":
+{% if product.featured_image %}
+  {{ product.featured_image | image_url: width: 400 | json }}
+{% else %}
+  null
+{% endif %},
+        "price": {{ product.price | money | json }},
+        "tags": {{ product.tags | json }}
+      }{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  ]
+</script>
+
+<script src="{{ 'quiz.js' | asset_url }}" defer="defer"></script>
+
+{% schema %}
+{
+  "name": "Mushroom Finder Quiz",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow text", "default": "Not sure where to start?" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Find your mushroom" },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Answer a few quick questions and we'll match you with products for your goal."
+    },
+    {
+      "type": "collection",
+      "id": "product_source",
+      "label": "Products to match against",
+      "info": "Defaults to All products if left blank."
+    },
+    {
+      "type": "collection",
+      "id": "fallback_collection",
+      "label": "Fallback collection (shown if nothing matches)",
+      "info": "Defaults to All products if left blank."
+    },
+    {
+      "type": "text",
+      "id": "tag_prefix",
+      "label": "Goal tag prefix",
+      "default": "goal-",
+      "info": "Tag products with, e.g., \"goal-immune\", \"goal-focus\", \"goal-cooking\", \"goal-wellness\", \"goal-energy\", \"goal-growing\" so the quiz can match them to a result."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "question",
+      "name": "Question",
+      "settings": [
+        { "type": "text", "id": "question", "label": "Question", "default": "What's your main goal today?" },
+        { "type": "text", "id": "answer_cooking", "label": "Answer — Cooking", "default": "Cook incredible meals" },
+        { "type": "text", "id": "answer_wellness", "label": "Answer — Wellness", "default": "Support overall wellness" },
+        { "type": "text", "id": "answer_immune", "label": "Answer — Immune Support", "default": "Boost my immune system" },
+        { "type": "text", "id": "answer_focus", "label": "Answer — Focus", "default": "Sharpen focus & mental clarity" },
+        { "type": "text", "id": "answer_energy", "label": "Answer — Energy", "default": "Get a natural energy lift" },
+        { "type": "text", "id": "answer_growing", "label": "Answer — Home Growing", "default": "Grow my own at home" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Mushroom Finder Quiz",
+      "blocks": [
+        { "type": "question", "settings": { "question": "What's your main goal today?" } },
+        {
+          "type": "question",
+          "settings": {
+            "question": "Pick the scenario that sounds most like you",
+            "answer_cooking": "Weeknight dinner needs an upgrade",
+            "answer_wellness": "I want a gentle daily ritual",
+            "answer_immune": "Cold and flu season has me worried",
+            "answer_focus": "I've got a big project and need to concentrate",
+            "answer_energy": "My 3pm slump is brutal",
+            "answer_growing": "I love a hands-on hobby"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "question": "How do you like to take your mushrooms?",
+            "answer_cooking": "Fresh, in a pan with butter and garlic",
+            "answer_wellness": "However's easiest to build a habit",
+            "answer_immune": "Steeped as a tea or tincture",
+            "answer_focus": "Stirred into my morning coffee",
+            "answer_energy": "A quick capsule, no prep needed",
+            "answer_growing": "I'd rather harvest it myself"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
